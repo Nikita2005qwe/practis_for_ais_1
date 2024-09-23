@@ -1,6 +1,7 @@
-def main():
-    print("hello, world!")
+from linked_list import LinkedList
 
- 
-if __name__ == "__main__":
-    main()
+class PlayList(LinkedList):
+    pass
+
+class Composition:
+    pass
