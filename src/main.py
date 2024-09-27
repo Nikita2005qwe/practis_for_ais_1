@@ -1,7 +1,10 @@
-from linked_list import LinkedList
+from LinkedList import LinkedList
 
-class PlayList(LinkedList):
-    pass
+def main() -> None:
+    lnk_list: LinkedList = LinkedList()
+    print(lnk_list.__len__())
+    print("Hello, world!")
 
-class Composition:
-    pass
+
+if __name__ == "__main__":
+    main()
