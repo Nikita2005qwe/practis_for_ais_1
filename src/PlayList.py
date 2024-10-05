@@ -45,7 +45,8 @@ class PlayList(LinkedList):
         """Получить текущий трек, реализовать в виде свойства"""
         return self.current_track.data if self.current_track else None
 
-    def play_track(self, track):
+    @staticmethod
+    def play_track(track):
         """Воспроизводит трек."""
         mixer.init()
         mixer.music.load(track.path)
@@ -88,3 +89,4 @@ class PlayList(LinkedList):
                 self.current_track = node1
         else:
             raise IndexError("Не удалось найти узлы по заданным индексам.")
+        
