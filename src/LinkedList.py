@@ -10,9 +10,12 @@ class LinkedList:
                 self.length += 1
                 if current.next_item == first_item:
                     break
-                current = current.next_item
+                if not (current.next_item is None):
+                    current = current.next_item
+                else:
+                    break
             current.next_item = first_item
-            first_item.previous_item = current
+            self.first_item.previous_item = current
 
     @property
     def last(self):
@@ -160,15 +163,16 @@ class LinkedList:
     def print_linked_list(self):
         """Функция для вывода всех узлов связного списка и их данных"""
         if self.first_item is None:
-            print("Список пуст.")
-            return
+            return "Список пуст"
 
         current_item = self.first_item
+        string = ""
         while True:
-            print(f"Узел: {current_item}, Данные: {current_item.data}")
+            string += f"Узел: {current_item}, Данные: {current_item.data}\n"
             current_item = current_item.next
             if current_item == self.first_item:
                 break
+        return string
 
 
 """Класс, который будет содержать ссылки на следующий и предыдущий элементы,
