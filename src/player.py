@@ -1,3 +1,8 @@
+"""
+Модуль содержащий класс GUI
+с методами отвечающими за функции кнопок в интерфэйсе
+"""
+import os
 from composition import Composition
 from playlist import PlayList
 from PyQt5.QtCore import Qt, QTimer
@@ -8,12 +13,41 @@ from PyQt5.QtWidgets import (
 )
 from pygame import mixer, USEREVENT
 import pygame
-import os
 
 
 class MusicPlayer(QWidget):
-    def __init__(self) -> None:
+    """
+    Класс GUI для приложения
+    """
+    def __init__(self):
         super().__init__()
+
+        self.playlist_combo = QComboBox()
+        self.add_playlist_btn = QPushButton("Добавить плейлист")
+        self.delete_playlist_btn = QPushButton("Удалить плейлист")
+        self.play_btn = QPushButton("Воспроизвести")
+        self.pause_btn = QPushButton("Пауза")
+        self.next_btn = QPushButton("Следующий")
+        self.prev_btn = QPushButton("Предыдущий")
+        self.add_track_btn = QPushButton("Добавить трек")
+        self.delete_track_btn = QPushButton("Удалить трек")
+        self.move_up_btn = QPushButton("Передвинуть вверх")
+        self.move_down_btn = QPushButton("Передвинуть вниз")
+        self.track_list = QListWidget()
+        self.current_track_label = QLabel("Текущий трек: Нет трека")
+
+        self.functions_dict: dict[QPushButton: callable] = {
+            self.add_playlist_btn: self.create_playlist,
+            self.delete_playlist_btn: self.delete_playlist,
+            self.play_btn: self.play_track,
+            self.pause_btn: self.pause_track,
+            self.next_btn: self.next_track,
+            self.prev_btn: self.prev_track,
+            self.add_track_btn: self.add_track,
+            self.delete_track_btn: self.delete_track,
+            self.move_up_btn: self.move_track_up,
+            self.move_down_btn: self.move_track_down
+        }
 
         self.playlists = {}
         self.current_playlist = None
@@ -36,50 +70,12 @@ class MusicPlayer(QWidget):
         main_layout = QVBoxLayout()
         controls_layout = QHBoxLayout()
 
-        self.playlist_combo = QComboBox()
         self.playlist_combo.currentIndexChanged.connect(self.switch_playlist)
-
-        self.add_playlist_btn = QPushButton("Добавить плейлист")
-        self.delete_playlist_btn = QPushButton("Удалить плейлист")
-        self.add_playlist_btn.clicked.connect(self.create_playlist)
-        self.delete_playlist_btn.clicked.connect(self.delete_playlist)
-
-        self.play_btn = QPushButton("Воспроизвести")
-        self.pause_btn = QPushButton("Пауза")
-        self.next_btn = QPushButton("Следующий")
-        self.prev_btn = QPushButton("Предыдущий")
-        self.add_track_btn = QPushButton("Добавить трек")
-        self.delete_track_btn = QPushButton("Удалить трек")
-
-        self.move_up_btn = QPushButton("Передвинуть вверх")
-        self.move_down_btn = QPushButton("Передвинуть вниз")
-
-        self.play_btn.clicked.connect(self.play_track)
-        self.pause_btn.clicked.connect(self.pause_track)
-        self.next_btn.clicked.connect(self.next_track)
-        self.prev_btn.clicked.connect(self.prev_track)
-        self.add_track_btn.clicked.connect(self.add_track)
-        self.delete_track_btn.clicked.connect(self.delete_track)
-
-        self.move_up_btn.clicked.connect(self.move_track_up)
-        self.move_down_btn.clicked.connect(self.move_track_down)
-
-        self.track_list = QListWidget()
         self.track_list.itemDoubleClicked.connect(self.double_click_play)
 
-        self.current_track_label = QLabel("Текущий трек: Нет трека")
-
-        controls_layout.addWidget(self.add_playlist_btn)
-        controls_layout.addWidget(self.delete_playlist_btn)
-        controls_layout.addWidget(self.play_btn)
-        controls_layout.addWidget(self.pause_btn)
-        controls_layout.addWidget(self.next_btn)
-        controls_layout.addWidget(self.prev_btn)
-        controls_layout.addWidget(self.add_track_btn)
-        controls_layout.addWidget(self.delete_track_btn)
-
-        controls_layout.addWidget(self.move_up_btn)
-        controls_layout.addWidget(self.move_down_btn)
+        for btn in self.functions_dict:
+            btn.clicked.connect(self.functions_dict[btn])
+            controls_layout.addWidget(btn)
 
         main_layout.addWidget(self.playlist_combo)
         main_layout.addWidget(self.track_list)
@@ -101,7 +97,13 @@ class MusicPlayer(QWidget):
     def create_playlist(self) -> None:
         """Создание плейлиста"""
         name, ok = QInputDialog.getText(self, 'Новый плейлист', 'Введите название плейлиста:')
-        if ok and name:
+        if name:
+            for current_name in self.playlists:
+                if current_name == name:
+                    QMessageBox.warning(self, "Плейлист существует", "Удалите старый плейлист.")
+                    ok = False
+                    break
+        if ok:
             self.playlists[name] = PlayList()
             self.playlist_combo.addItem(name)
             self.playlist_combo.setCurrentText(name)
@@ -136,7 +138,8 @@ class MusicPlayer(QWidget):
     def add_track(self) -> None:
         """Добавить трек в текущий плейлист"""
         if not self.playlists:
-            QMessageBox.warning(self, "Плейлист отсутствует", "Создайте плейлист перед добавлением трека.")
+            QMessageBox.warning(self, "Плейлист отсутствует",
+                                "Создайте плейлист перед добавлением трека.")
             return
 
         file_dialog = QFileDialog()
@@ -255,6 +258,10 @@ class MusicPlayer(QWidget):
         self.is_paused = True
 
     def check_track_end_event(self) -> None:
+        """
+        Проверка композиции на событие:
+        воспроизведение композиции завершено
+        """
         for event in pygame.event.get():
             if event.type == self.track_end_event:
                 self.next_track()

@@ -61,8 +61,10 @@ class LinkedList:
         self.append_right(data)
 
     def remove(self, data: Any) -> None:
-        """Удаление элемента, при его отсутствии в списке
-        должно возбуждать исключение ValueError"""
+        """
+        Удаление элемента, при его отсутствии в списке
+        должно возбуждать исключение ValueError
+        """
         if self.first_item is None:
             raise ValueError()
         current_item = self.first_item
@@ -161,8 +163,10 @@ class LinkedList:
 
 
 class LinkedListItem:
-    """Класс, который будет содержать ссылки на следующий и предыдущий элементы,
-а также данные в виде экземпляра Composition"""
+    """
+    Класс, который будет содержать ссылки на следующий и предыдущий элементы,
+    а также данные в виде экземпляра Composition
+    """
 
     def __init__(self, data: Any) -> None:
         self.data = data
