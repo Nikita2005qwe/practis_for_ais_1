@@ -2,7 +2,7 @@
 
 import unittest
 
-from LinkedList import LinkedListItem, LinkedList  # pylint: disable=E0401
+from linked_list import LinkedListItem, LinkedList  # pylint: disable=E0401
 
 
 TEST_LEN = [
@@ -238,9 +238,8 @@ class TestLinkedList(unittest.TestCase):
         """Тест метода insert"""
         for node_list, index, data in TEST_INSERT:
             linked_list = create_linked_list(node_list)
-            with self.subTest(node_list=node_list, index=index,
-                              data=data):
-                linked_list.insert(linked_list[index], data)
+            with self.subTest(node_list=node_list, index=index, data=data):
+                linked_list.insert(linked_list[index], LinkedListItem(data))
                 self.assertEqual(len(linked_list), len(node_list) + 1)
                 node_list.insert(index + 1, data)
                 self.assertEqual([i.data for i in linked_list], node_list)
